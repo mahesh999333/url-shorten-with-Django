@@ -100,7 +100,12 @@ $(document).on('submit','#post-form',function(e){
       csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
     },
     success: function(data){
-      $('h2').html("localhost:8000/"+data)
+      if (data == "Given link cannot be shorten further."){
+        $('h2').html(data)
+      }
+      else {
+        $('h2').html("localhost:8000/"+data)
+      }
     }
   });
 });

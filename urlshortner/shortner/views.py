@@ -4,9 +4,14 @@ from .models import Url
 from django.http import HttpResponse
 
 
+def index(request):
+    return render(request, 'index.html')
+
 def create(request):
     if request.method == 'POST':
         link = request.POST['link']
+        if link.startswith('localhost'):
+            return HttpResponse("Given link cannot be shorten further.")
         link_in_db = Url.objects.filter(link=link)
         if link_in_db.exists():
             return HttpResponse(link_in_db[0].uuid)
