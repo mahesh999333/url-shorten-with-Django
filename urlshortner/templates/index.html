@@ -1,126 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
   <style>
-      *,
-*::before,
-*::after {
-box-sizing: border-box;
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Lato", sans-serif;
+      line-height: 1.5;
+      color: #111;
+      margin: 0; /* Remove default margin */
+      background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+      background-attachment: fixed; /* Fix the background while scrolling */
+    }
+
+    main {
+      max-width: 720px;
+      width: 100%;
+      margin: 2rem auto; /* Center the main container and add some margin */
+      border: 2.5px solid #330867;
+      border-radius: 2.5px;
+      box-shadow: 0 10px 20px rgba(17, 17, 17, 0.125),
+        0 5px 5px rgba(17, 17, 17, 0.25);
+      background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent white background */
+    }
+
+    h1 {
+      padding: 1rem;
+      color: #330867; /* Match the color to the border */
+    }
+
+    input,
+    button {
+      font-family: inherit;
+      line-height: inherit;
+      color: inherit;
+      border: 0;
+      padding: 1rem;
+    }
+
+    input {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .buttons {
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  align-items: center; /* Center the buttons vertically */
+  margin-top: 1rem; /* Add some space at the top for better separation */
 }
 
-body,
-section {
-display: flex;
-align-items: center;
-justify-content: center;
-padding: 1rem;
+.buttons button {
+  cursor: pointer;
+  margin: 0.5rem; /* Add some space between the buttons */
+  flex: 1;
+  background-color: transparent;
+  color: rgb(86, 41, 41);
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition effect */
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #330867; /* Darken the text color on hover */
+  }
 }
 
-body {
-min-height: 100vh;
-font-family: "Lato", sans-serif;
-line-height: 1.5;
-color: #111;
-}
 
-main {
-max-width: 720px;
-width: 100%;
-border: 2.5px solid #330867;
-border-radius: 2.5px;
-box-shadow: 0 10px 20px rgba(17, 17, 17, 0.125),
-  0 5px 5px rgba(17, 17, 17, 0.25);
-background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
-}
+    .buttons button:hover {
+      background-color: #330867; /* Darken the background color on hover */
+      color: #e92d2d; /* Change text color on hover */
+    }
 
-h1 {
-padding: 1rem;
-color: white;
-}
-
-input,
-button {
-font-family: inherit;
-line-height: inherit;
-color: inherit;
-border: 0;
-padding: 1rem;
-}
-
-input {
-box-sizing: border-box;
-width: 100%;
-}
-
-.buttons {
-display: flex;
-}
-
-button {
-cursor: pointer;
-flex: 1;
-background-color: transparent;
-color: white;
-&:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-}
-
-section {
-min-height: 120px;
-text-align: center;
-background-color: white;
-}
-
+    section {
+      min-height: 120px;
+      text-align: center;
+      background-color: white;
+      padding: 1rem; /* Add some padding for better readability */
+      border-radius: 5px; /* Add rounded corners to the section */
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow effect */
+    }
   </style>
 </head>
-<main>
-<h1>URL Shortener</h1>
-<form id="post-form">
-  {% csrf_token %}
-<input type="text" name="link" id="link" placeholder="Enter URL here">
-<div class="buttons">
-  <button type="submit" id="shorten">Shorten</button>
-  <button type="button" id="delete">Delete</button>
-</div>
-</form>
+<body>
+  <main>
+    <h1>URL Shortener</h1>
+    <form id="post-form">
+      {% csrf_token %}
+      <input type="text" name="link" id="link" placeholder="Enter URL here">
+      <div class="buttons">
+        <button type="submit" id="shorten">Shorten</button>
+        <button type="button" id="delete">Delete</button>
+      </div>
+    </form>
 
-<section id="section"><h2></h2></section>
-  
-</main>
+    <section id="section"><h2></h2></section>
+  </main>
 
-<script type="text/javascript">
-$(document).on('submit','#post-form',function(e){
-  e.preventDefault();
+  <script type="text/javascript">
+    $(document).on('submit', '#post-form', function (e) {
+      e.preventDefault();
 
-  $.ajax({
-    type:'POST',
-    url:'/create',
-    data:{
-      link:$('#link').val(),
-      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-    },
-    success: function(data){
-      if (data == "Given link cannot be shorten further."){
-        $('h2').html(data)
-      }
-      else {
-        $('h2').html("localhost:8000/"+data)
-      }
-    }
-  });
-});
-$(document).on('click','#delete',function(e){
-  e.preventDefault();
-  var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
-  $.ajax({
-    type:'DELETE',
-    url:'/delete/?link='+$('#link').val(),
-    headers:{
-        'X-CSRFToken': csrfToken
-    },
-    success: function(data){
-      $('h2').html(data)
-    }
-  });
-});
-</script>
+      $.ajax({
+        type: 'POST',
+        url: '/create',
+        data: {
+          link: $('#link').val(),
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {
+          if (data == "Given link cannot be shortened further.") {
+            $('h2').html(data)
+          }
+          else {
+            $('h2').html(data)
+          }
+        }
+      });
+    });
+    $(document).on('click', '#delete', function (e) {
+      e.preventDefault();
+      var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+      $.ajax({
+        type: 'DELETE',
+        url: '/delete/?link=' + $('#link').val(),
+        headers: {
+          'X-CSRFToken': csrfToken
+        },
+        success: function (data) {
+          $('h2').html(data)
+        }
+      });
+    });
+  </script>
+</body>
+</html>
