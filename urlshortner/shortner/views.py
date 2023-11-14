@@ -15,7 +15,7 @@ def create(request):
                 return HttpResponse("Given link cannot be shorten further.")
             link_in_db = Url.objects.filter(link=link)
             if link_in_db.exists():
-                return HttpResponse(link_in_db[0].uuid)
+                return HttpResponse("localhost:8000/" + link_in_db[0].uuid)
             uid = str(uuid.uuid4())[:5]
             new_url = Url(link=link,uuid=uid)
             new_url.save()
