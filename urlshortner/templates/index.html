@@ -46,6 +46,14 @@
       /* Match the color to the border */
     }
 
+    h5 {
+      margin-left: 10px; /* Add some space to the left of the "Expiry Date" text */
+    }
+
+    p {
+      margin-left: 10px; /* Add some space to the left of the "Expiry Date" text */
+    }
+
     input,
     button {
       font-family: inherit;
@@ -124,9 +132,12 @@
     <form id="post-form">
       {% csrf_token %}
       <input type="text" name="link" id="link" placeholder="Enter URL here">
+      <h5>Expiry Date</h5>
+      <input type="datetime-local" name="expiration_date" id="expiration_date" placeholder="Expiration Date (optional)" ><p>Note: Link will be valid for one month only by default, you can choose the expiry date above.</p>
       <div class="buttons">
         <button type="submit" id="shorten">Shorten</button>
         <button type="button" id="delete">Delete</button>
+        <button type="button" id="extend">Extend Validity</button>
       </div>
     </form>
 
@@ -144,6 +155,7 @@
         url: '/create',
         data: {
           link: $('#link').val(),
+          expiration_date: $('#expiration_date').val(),  // Include expiration_date in the data
           csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },
         success: function (data) {
@@ -157,6 +169,7 @@
         }
       });
     });
+
     $(document).on('click', '#delete', function (e) {
       e.preventDefault();
       var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
@@ -172,6 +185,26 @@
         }
       });
     });
+
+    $(document).on('click', '#extend', function (e) {
+    e.preventDefault();
+    var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+    var expirationDate = $('#expiration_date').val();
+
+    $.ajax({
+      type: 'POST',
+      url: '/extend_validity',
+      data: {
+        link: $('#link').val(),
+        expiration_date: expirationDate,
+        csrfmiddlewaretoken: csrfToken,
+      },
+      success: function (data) {
+        $('h2').html(data);
+        $('h2').addClass('highlighted');
+      }
+    });
+  });
   </script>
 </body>
 

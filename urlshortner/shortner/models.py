@@ -4,3 +4,4 @@ from django.db import models
 class Url(models.Model):
     link = models.CharField(max_length=10000)
     uuid = models.CharField(max_length=10)
+    expiration_date = models.DateTimeField(null=True, blank=True)
